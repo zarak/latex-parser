@@ -1,0 +1,7 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:latex-parser"
+
+    - path: "app/Main.hs"
+      component: "latex-parser:exe:latex-parser"
