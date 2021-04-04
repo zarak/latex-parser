@@ -22,6 +22,9 @@
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\cat}{%
+  \textsf%
+}
 
 \newtheorem{theorem}{Theorem}
 \theoremstyle{definition}
@@ -35,7 +38,20 @@
 
 \begin{document}
 \maketitle
-  \begin{equation}
-    This is an awesome env $2x+3$.
-  \end{equation}
+
+\begin{definition}{Group}{def:group}
+  A \em{group} is a groupoid with a single object.
+\end{definition}
+
+\begin{definition}{Initial and final objects}{def:initial_final_objects}
+  Let $\cat{C}$ be a category. We say that an object $I$ of $\cat C$ is
+  \textit{initial} in \cat{C} if for every object $A$ of \cat{C} there exists
+  \textit{exactly one} morphism $I \to  A$ in $\cat{C}$:
+
+  \begin{equation*}
+    \forall A \in \cat{Obj(C)} : \quad \cat{Hom}_\cat{C}(I, A) \text{ is
+    a singleton }
+  \end{equation*}
+\end{definition}
+
 \end{document}
