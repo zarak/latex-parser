@@ -31,7 +31,6 @@ library
     -- other-extensions:
     build-depends:    base ^>=4.14.1.0
                     , HaTeX
-                    , anki-tools
                     , req
                     , aeson
     hs-source-dirs:   src
