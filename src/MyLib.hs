@@ -15,14 +15,14 @@ import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv, prot
 -- import Text.LaTeX.Base.Pretty (prettyLaTeX)
 
 data MathBasic = MathBasic
-  { front :: Text,
-    back :: Text
+  { front :: Text
+  , back :: Text
   }
   deriving (Show)
 
 data MathCloze = MathCloze
-  { clozeText :: Text,
-    extra :: Text
+  { clozeText :: Text
+  , extra :: Text
   }
   deriving (Show)
 
@@ -30,14 +30,14 @@ data MathCloze = MathCloze
 parseDefinition :: ([TeXArg], LaTeX) -> MathBasic
 parseDefinition ([], latex) =
   MathBasic
-    { front = "",
-      back = render latex
+    { front = ""
+    , back = render latex
     }
-parseDefinition (firstArg : restArgs, latex) =
-  let (FixArg def) = firstArg
+parseDefinition (definition : restArgs, latex) =
+  let (FixArg def) = definition
    in MathBasic
-        { front = render def,
-          back = render latex
+        { front = render def
+        , back = render latex
         }
 
 getDefinitions :: LaTeX -> [MathBasic]
@@ -53,8 +53,8 @@ getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
   let payload =
         object
-          [ "action" .= ("deckNames" :: String),
-            "version" .= (6 :: Int)
+          [ "action" .= ("deckNames" :: String)
+          , "version" .= (6 :: Int)
           ]
 
   r <-
@@ -70,11 +70,11 @@ sendToAnki :: [MathBasic] -> IO ()
 sendToAnki cards = runReq defaultHttpConfig $ do
   let payload =
         object
-          [ "action" .= ("addNotes" :: String),
-            "version" .= (6 :: Int),
-            "params"
+          [ "action" .= ("addNotes" :: String)
+          , "version" .= (6 :: Int)
+          , "params"
               .= object
-                [ "notes" .= cardObjects cards ]
+                ["notes" .= cardObjects cards]
           ]
 
   r <-
@@ -86,18 +86,17 @@ sendToAnki cards = runReq defaultHttpConfig $ do
       (port 8765)
   liftIO $ print (responseBody r :: Value)
 
-
 cardObjects :: [MathBasic] -> [Value]
 cardObjects =
-  map f 
-    where
-      f = \c ->
-              object
-                [ "deckName" .= ("Test" :: String),
-                  "modelName" .= ("MathBasic" :: String),
-                  "fields"
-                    .= object
-                      [ "Front" .= (T.unpack $ front c :: String),
-                        "Back" .= (T.unpack $ back c :: String)
-                      ]
-                ]
+  map f
+ where
+  f = \c ->
+    object
+      [ "deckName" .= ("Test" :: String)
+      , "modelName" .= ("MathBasic" :: String)
+      , "fields"
+          .= object
+            [ "Front" .= (T.unpack $ front c :: String)
+            , "Back" .= (T.unpack $ back c :: String)
+            ]
+      ]
