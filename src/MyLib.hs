@@ -19,16 +19,16 @@ getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
     let payload =
           object
-          [ "action" .= ("decknames" :: String)
+          [ "action" .= ("deckNames" :: String)
           , "version" .= (6 :: Int)
           ]
 
     r <-
       req
       POST
-      (http "localhost:8765")
+      (http "localhost")
       (ReqBodyJson payload)
       jsonResponse
-      mempty
+      (port 8765)
     liftIO $ print (responseBody r :: Value)
 
