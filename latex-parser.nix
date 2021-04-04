@@ -1,11 +1,11 @@
-{ mkDerivation, base, lib }:
+{ mkDerivation, anki-tools, base, HaTeX, lib, req }:
 mkDerivation {
   pname = "latex-parser";
   version = "0.1.0.0";
   src = ./.;
   isLibrary = true;
   isExecutable = true;
-  libraryHaskellDepends = [ base ];
+  libraryHaskellDepends = [ anki-tools base HaTeX req ];
   executableHaskellDepends = [ base ];
   license = "unknown";
   hydraPlatforms = lib.platforms.none;
