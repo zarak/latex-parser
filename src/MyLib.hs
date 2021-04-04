@@ -1,11 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module MyLib (someFunc) where
 
-import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
-import Text.LaTeX.Base.Syntax (lookForEnv)
+import Control.Monad.IO.Class (liftIO)
 import Data.Aeson
 import Network.HTTP.Req
-import Control.Monad.IO.Class (liftIO)
+import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
+import Text.LaTeX.Base.Syntax (lookForEnv)
 
 someFunc :: IO ()
 someFunc = do
@@ -14,47 +15,49 @@ someFunc = do
     Left e -> print e
     Right latex -> print $ lookForEnv "equation" latex
 
-
 getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
-    let payload =
-          object
-          [ "action" .= ("deckNames" :: String)
-          , "version" .= (6 :: Int)
+  let payload =
+        object
+          [ "action" .= ("deckNames" :: String),
+            "version" .= (6 :: Int)
           ]
 
-    r <-
-      req
+  r <-
+    req
       POST
       (http "localhost")
       (ReqBodyJson payload)
       jsonResponse
       (port 8765)
-    liftIO $ print (responseBody r :: Value)
+  liftIO $ print (responseBody r :: Value)
 
 createCard :: IO ()
 createCard = runReq defaultHttpConfig $ do
-    let payload =
-          object
-          [ "action" .= ("addNote" :: String)
-          , "version" .= (6 :: Int)
-          , "params" .= object
-                        [ "note" .= object
-                                    [ "deckName" .= ("Test" :: String)
-                                    , "modelName" .= ("Basic" :: String)
-                                    , "fields" .= object
-                                                  [ "Front" .= ("front content" :: String)
-                                                  , "Back" .= ("back content" :: String)
-                                                  ]
-                                    ]
-                        ]
+  let payload =
+        object
+          [ "action" .= ("addNote" :: String),
+            "version" .= (6 :: Int),
+            "params"
+              .= object
+                [ "note"
+                    .= object
+                      [ "deckName" .= ("Test" :: String),
+                        "modelName" .= ("Basic" :: String),
+                        "fields"
+                          .= object
+                            [ "Front" .= ("front content" :: String),
+                              "Back" .= ("back content" :: String)
+                            ]
+                      ]
+                ]
           ]
 
-    r <-
-      req
+  r <-
+    req
       POST
       (http "localhost")
       (ReqBodyJson payload)
       jsonResponse
       (port 8765)
-    liftIO $ print (responseBody r :: Value)
+  liftIO $ print (responseBody r :: Value)
