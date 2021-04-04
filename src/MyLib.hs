@@ -14,29 +14,36 @@ import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv, prot
 
 -- import Text.LaTeX.Base.Pretty (prettyLaTeX)
 
-data BasicCard = BasicCard
+data MathBasic = MathBasic
   { front :: Text,
     back :: Text
   }
   deriving (Show)
 
-emptyCard :: BasicCard
-emptyCard = BasicCard {front = "", back = ""}
+data MathCloze = MathCloze
+  { clozeText :: Text
+  , extra :: Text
+  }
+  deriving Show
+
+
+emptyCard :: MathBasic
+emptyCard = MathBasic {front = "", back = ""}
 
 -- Return the text for the front and back of a card
-parseDefinition :: ([TeXArg], LaTeX) -> BasicCard
+parseDefinition :: ([TeXArg], LaTeX) -> MathBasic
 parseDefinition input =
   let (FixArg def) = head (fst input)
-   in BasicCard
+   in MathBasic
         { front = render def
         , back = render $ snd input
         }
 
-getDefinitions :: LaTeX -> [BasicCard]
+getDefinitions :: LaTeX -> [MathBasic]
 getDefinitions latex =
   parseDefinition <$> lookForEnv "definition" latex
 
-someFunc :: IO [BasicCard]
+someFunc :: IO [MathBasic]
 someFunc = do
   res <- parseLaTeXFile "test.tex"
   pure $ either (const []) getDefinitions res
@@ -58,7 +65,7 @@ getDeckNames = runReq defaultHttpConfig $ do
       (port 8765)
   liftIO $ print (responseBody r :: Value)
 
-createCard :: [BasicCard] -> IO ()
+createCard :: [MathBasic] -> IO ()
 createCard cards = runReq defaultHttpConfig $ do
   let payload =
         object
@@ -79,7 +86,7 @@ createCard cards = runReq defaultHttpConfig $ do
   liftIO $ print (responseBody r :: Value)
 
 
-cardObjects :: [BasicCard] -> [Value]
+cardObjects :: [MathBasic] -> [Value]
 cardObjects =
   map f 
     where
