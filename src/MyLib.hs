@@ -32,3 +32,29 @@ getDeckNames = runReq defaultHttpConfig $ do
       (port 8765)
     liftIO $ print (responseBody r :: Value)
 
+createCard :: IO ()
+createCard = runReq defaultHttpConfig $ do
+    let payload =
+          object
+          [ "action" .= ("addNote" :: String)
+          , "version" .= (6 :: Int)
+          , "params" .= object
+                        [ "note" .= object
+                                    [ "deckName" .= ("All" :: String)
+                                    , "modelName" .= ("Basic" :: String)
+                                    , "fields" .= object
+                                                  [ "Front" .= ("front content" :: String)
+                                                  , "Back" .= ("back content" :: String)
+                                                  ]
+                                    ]
+                        ]
+          ]
+
+    r <-
+      req
+      POST
+      (http "localhost")
+      (ReqBodyJson payload)
+      jsonResponse
+      (port 8765)
+    liftIO $ print (responseBody r :: Value)
