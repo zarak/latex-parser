@@ -8,37 +8,38 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Network.HTTP.Req
 import Text.LaTeX.Base (render)
+import Text.LaTeX.Base.Class (fromLaTeX)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
 import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv, protectText)
-import Text.LaTeX.Base.Class (fromLaTeX)
+
 -- import Text.LaTeX.Base.Pretty (prettyLaTeX)
 
 data BasicCard = BasicCard
-  { front :: Text
-  , back :: Text
-  } 
-  deriving Show
+  { front :: Text,
+    back :: Text
+  }
+  deriving (Show)
 
 emptyCard :: BasicCard
-emptyCard = BasicCard { front = "", back = "" }
+emptyCard = BasicCard {front = "", back = ""}
 
 -- Return the text for the front and back of a card
 parseDefinition :: [([TeXArg], LaTeX)] -> BasicCard
 parseDefinition input =
   let (FixArg def) = head (fst (input !! 1))
-  in
-      BasicCard { front = render def
-                , back = render $ snd (input !! 1)
-                }
+   in BasicCard
+        { front = render def,
+          back = render $ snd (input !! 1)
+        }
 
 getFirstDefinition :: LaTeX -> BasicCard
 getFirstDefinition latex =
-      parseDefinition $ lookForEnv "definition" latex
+  parseDefinition $ lookForEnv "definition" latex
 
 someFunc :: IO BasicCard
 someFunc = do
   res <- parseLaTeXFile "test.tex"
-  pure $ either (const emptyCard) getFirstDefinition res 
+  pure $ either (const emptyCard) getFirstDefinition res
 
 getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
