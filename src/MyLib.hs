@@ -9,9 +9,9 @@ import qualified Data.Text as T
 import Network.HTTP.Req
 import Text.LaTeX.Base (render)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
-import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv)
-import Text.LaTeX.Base.Syntax (protectText)
+import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv, protectText)
 import Text.LaTeX.Base.Class (fromLaTeX)
+-- import Text.LaTeX.Base.Pretty (prettyLaTeX)
 
 data BasicCard = BasicCard
   { front :: Text
