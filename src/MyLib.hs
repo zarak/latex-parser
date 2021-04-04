@@ -11,6 +11,12 @@ import Text.LaTeX.Base (render)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
 import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv)
 
+data BasicCard = BasicCard
+  { front :: String
+  , back :: String
+  }
+
+-- Return the text for the front and back of a card
 parseDefinition :: [([TeXArg], LaTeX)] -> (Text, Text)
 parseDefinition input = do
   let (FixArg def) = head (fst (head input))
@@ -43,8 +49,8 @@ getDeckNames = runReq defaultHttpConfig $ do
       (port 8765)
   liftIO $ print (responseBody r :: Value)
 
-createCard :: IO ()
-createCard = runReq defaultHttpConfig $ do
+createCard :: BasicCard -> IO ()
+createCard card = runReq defaultHttpConfig $ do
   let payload =
         object
           [ "action" .= ("addNote" :: String),
@@ -57,8 +63,8 @@ createCard = runReq defaultHttpConfig $ do
                         "modelName" .= ("Basic" :: String),
                         "fields"
                           .= object
-                            [ "Front" .= ("front content" :: String),
-                              "Back" .= ("back content" :: String)
+                            [ "Front" .= (front card :: String),
+                              "Back" .= (back card :: String)
                             ]
                       ]
                 ]
