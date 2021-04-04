@@ -12,25 +12,31 @@ import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
 import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv)
 
 data BasicCard = BasicCard
-  { front :: String
-  , back :: String
-  }
+  { front :: Text
+  , back :: Text
+  } 
+  deriving Show
+
+emptyCard :: BasicCard
+emptyCard = BasicCard { front = "", back = "" }
 
 -- Return the text for the front and back of a card
-parseDefinition :: [([TeXArg], LaTeX)] -> (Text, Text)
-parseDefinition input = do
+parseDefinition :: [([TeXArg], LaTeX)] -> BasicCard
+parseDefinition input =
   let (FixArg def) = head (fst (head input))
-  (render def, render $ snd (head input))
+  in
+      BasicCard { front = render def
+                , back = render $ snd (head input)
+                }
 
-someFunc :: IO ()
+getFirstDefinition :: LaTeX -> BasicCard
+getFirstDefinition latex =
+      parseDefinition $ lookForEnv "definition" latex
+
+someFunc :: IO BasicCard
 someFunc = do
   res <- parseLaTeXFile "test.tex"
-  case res of
-    Left e -> print e
-    Right latex -> do
-      -- print $ lookForEnv "equation" latex
-      let x = parseDefinition $ lookForEnv "definition" latex
-      print x
+  pure $ either (const emptyCard) getFirstDefinition res 
 
 getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
@@ -60,11 +66,11 @@ createCard card = runReq defaultHttpConfig $ do
                 [ "note"
                     .= object
                       [ "deckName" .= ("Test" :: String),
-                        "modelName" .= ("Basic" :: String),
+                        "modelName" .= ("MathBasic" :: String),
                         "fields"
                           .= object
-                            [ "Front" .= (front card :: String),
-                              "Back" .= (back card :: String)
+                            [ "Front" .= (T.unpack $ front card :: String),
+                              "Back" .= (T.unpack $ back card :: String)
                             ]
                       ]
                 ]
