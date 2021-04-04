@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module MyLib (someFunc, createCard) where
+module MyLib (someFunc, sendToAnki) where
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson
@@ -21,22 +21,23 @@ data MathBasic = MathBasic
   deriving (Show)
 
 data MathCloze = MathCloze
-  { clozeText :: Text
-  , extra :: Text
+  { clozeText :: Text,
+    extra :: Text
   }
-  deriving Show
-
-
-emptyCard :: MathBasic
-emptyCard = MathBasic {front = "", back = ""}
+  deriving (Show)
 
 -- Return the text for the front and back of a card
 parseDefinition :: ([TeXArg], LaTeX) -> MathBasic
-parseDefinition input =
-  let (FixArg def) = head (fst input)
+parseDefinition ([], latex) =
+  MathBasic
+    { front = "",
+      back = render latex
+    }
+parseDefinition (firstArg : restArgs, latex) =
+  let (FixArg def) = firstArg
    in MathBasic
-        { front = render def
-        , back = render $ snd input
+        { front = render def,
+          back = render latex
         }
 
 getDefinitions :: LaTeX -> [MathBasic]
@@ -65,8 +66,8 @@ getDeckNames = runReq defaultHttpConfig $ do
       (port 8765)
   liftIO $ print (responseBody r :: Value)
 
-createCard :: [MathBasic] -> IO ()
-createCard cards = runReq defaultHttpConfig $ do
+sendToAnki :: [MathBasic] -> IO ()
+sendToAnki cards = runReq defaultHttpConfig $ do
   let payload =
         object
           [ "action" .= ("addNotes" :: String),

@@ -1,7 +1,7 @@
 module Main where
 
 import Params (Params, cmdLineParser)
-import MyLib (someFunc, createCard)
+import MyLib (someFunc, sendToAnki)
 
 main :: IO ()
 main = cmdLineParser >>= work
@@ -9,5 +9,5 @@ main = cmdLineParser >>= work
 work :: Params -> IO ()
 work params = do
   fd <- someFunc
-  createCard fd
+  sendToAnki fd
 
