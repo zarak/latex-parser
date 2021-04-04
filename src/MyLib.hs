@@ -4,15 +4,17 @@ module MyLib (someFunc) where
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson
+import Data.Text (Text)
+import qualified Data.Text as T
 import Network.HTTP.Req
+import Text.LaTeX.Base (render)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
-import Text.LaTeX.Base.Syntax (lookForEnv, LaTeX, TeXArg)
+import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv)
 
-
-parseDefinition :: [([TeXArg], LaTeX)] -> IO (String, String)
+parseDefinition :: [([TeXArg], LaTeX)] -> (Text, Text)
 parseDefinition input = do
-  print (head input)
-  pure ("A", "B")
+  let (FixArg def) = head (fst (head input))
+  (render def, render $ snd (head input))
 
 someFunc :: IO ()
 someFunc = do
@@ -21,7 +23,7 @@ someFunc = do
     Left e -> print e
     Right latex -> do
       -- print $ lookForEnv "equation" latex
-      x <- parseDefinition $ lookForEnv "definition" latex
+      let x = parseDefinition $ lookForEnv "definition" latex
       print x
 
 getDeckNames :: IO ()
