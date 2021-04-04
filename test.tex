@@ -29,6 +29,7 @@
 \newtheorem{theorem}{Theorem}
 \theoremstyle{definition}
 \newtheorem{example}{Example}
+\newtheorem{proposition}{Proposition}
 
 \setlength{\parindent}{0pt}
 
@@ -44,8 +45,8 @@
 \end{definition}
 
 \begin{definition}{Initial and final objects}{def:initial_final_objects}
-  Let $\cat{C}$ be a category. We say that an object $I$ of $\cat C$ is
-  \textit{initial} in \cat{C} if for every object $A$ of \cat{C} there exists
+  Let $\cat{C}$ be a category. We say that an object $I$ of $\cat{C}$ is
+  \textit{initial} in $\cat{C}$ if for every object $A$ of $\cat{C}$ there exists
   \textit{exactly one} morphism $I \to  A$ in $\cat{C}$:
 
   \begin{equation*}
@@ -53,5 +54,15 @@
     a singleton }
   \end{equation*}
 \end{definition}
+
+\begin{proposition}
+  Let $\cat{C}$ be a category.
+  \begin{enumerate}
+    \item If $ I_1, I_2$ are both initial objects in $\cat{C}$, then $ I_1
+      \cong I_2$
+    \item If $F_1, F_2$ are both final objects in $ \cat{C}$, then $ F_1 \cong
+      F_2$.
+  \end{enumerate}
+\end{proposition}
 
 \end{document}
