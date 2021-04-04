@@ -24,22 +24,22 @@ emptyCard :: BasicCard
 emptyCard = BasicCard {front = "", back = ""}
 
 -- Return the text for the front and back of a card
-parseDefinition :: [([TeXArg], LaTeX)] -> BasicCard
+parseDefinition :: ([TeXArg], LaTeX) -> BasicCard
 parseDefinition input =
-  let (FixArg def) = head (fst (input !! 1))
+  let (FixArg def) = head (fst input)
    in BasicCard
-        { front = render def,
-          back = render $ snd (input !! 1)
+        { front = render def
+        , back = render $ snd input
         }
 
-getFirstDefinition :: LaTeX -> BasicCard
-getFirstDefinition latex =
-  parseDefinition $ lookForEnv "definition" latex
+getDefinitions :: LaTeX -> [BasicCard]
+getDefinitions latex =
+  parseDefinition <$> lookForEnv "definition" latex
 
-someFunc :: IO BasicCard
+someFunc :: IO [BasicCard]
 someFunc = do
   res <- parseLaTeXFile "test.tex"
-  pure $ either (const emptyCard) getFirstDefinition res
+  pure $ either (const []) getDefinitions res
 
 getDeckNames :: IO ()
 getDeckNames = runReq defaultHttpConfig $ do
@@ -58,25 +58,15 @@ getDeckNames = runReq defaultHttpConfig $ do
       (port 8765)
   liftIO $ print (responseBody r :: Value)
 
-createCard :: BasicCard -> IO ()
-createCard card = runReq defaultHttpConfig $ do
+createCard :: [BasicCard] -> IO ()
+createCard cards = runReq defaultHttpConfig $ do
   let payload =
         object
-          [ "action" .= ("addNote" :: String),
+          [ "action" .= ("addNotes" :: String),
             "version" .= (6 :: Int),
             "params"
               .= object
-                [ "note"
-                    .= object
-                      [ "deckName" .= ("Test" :: String),
-                        "modelName" .= ("MathBasic" :: String),
-                        "fields"
-                          .= object
-                            [ "Front" .= (T.unpack $ front card :: String),
-                              "Back" .= (T.unpack $ back card :: String)
-                            ]
-                      ]
-                ]
+                [ "notes" .= cardObjects cards ]
           ]
 
   r <-
@@ -87,3 +77,19 @@ createCard card = runReq defaultHttpConfig $ do
       jsonResponse
       (port 8765)
   liftIO $ print (responseBody r :: Value)
+
+
+cardObjects :: [BasicCard] -> [Value]
+cardObjects =
+  map f 
+    where
+      f = \c ->
+              object
+                [ "deckName" .= ("Test" :: String),
+                  "modelName" .= ("MathBasic" :: String),
+                  "fields"
+                    .= object
+                      [ "Front" .= (T.unpack $ front c :: String),
+                        "Back" .= (T.unpack $ back c :: String)
+                      ]
+                ]
