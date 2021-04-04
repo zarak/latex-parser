@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module MyLib (someFunc) where
+module MyLib (someFunc, createCard) where
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson
