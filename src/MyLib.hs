@@ -10,6 +10,8 @@ import Network.HTTP.Req
 import Text.LaTeX.Base (render)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
 import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv)
+import Text.LaTeX.Base.Syntax (protectText)
+import Text.LaTeX.Base.Class (fromLaTeX)
 
 data BasicCard = BasicCard
   { front :: Text
@@ -23,10 +25,10 @@ emptyCard = BasicCard { front = "", back = "" }
 -- Return the text for the front and back of a card
 parseDefinition :: [([TeXArg], LaTeX)] -> BasicCard
 parseDefinition input =
-  let (FixArg def) = head (fst (head input))
+  let (FixArg def) = head (fst (input !! 1))
   in
       BasicCard { front = render def
-                , back = render $ snd (head input)
+                , back = render $ snd (input !! 1)
                 }
 
 getFirstDefinition :: LaTeX -> BasicCard
