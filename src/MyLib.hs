@@ -8,9 +8,10 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Network.HTTP.Req
 import Text.LaTeX.Base (render)
+import Text.LaTeX.Base.Render (Render(..))
 import Text.LaTeX.Base.Class (fromLaTeX)
 import Text.LaTeX.Base.Parser (parseLaTeX, parseLaTeXFile)
-import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw), TeXArg (FixArg), lookForEnv, protectText)
+import Text.LaTeX.Base.Syntax (LaTeX (TeXRaw, TeXMath), TeXArg (FixArg), lookForEnv, protectText, MathType)
 
 -- import Text.LaTeX.Base.Pretty (prettyLaTeX)
 
@@ -25,6 +26,21 @@ data MathCloze = MathCloze
   , extra :: Text
   }
   deriving (Show)
+
+data ClozeLaTeX
+  = LaTeX LaTeX
+  | ClozeTeXMath MathType LaTeX -- mimicing the TexMath constrctor
+  deriving Show
+
+-- {{c1:: _ }}
+
+instance Render ClozeLaTeX where
+  renderBuilder (LaTeX latex) = renderBuilder latex
+  renderBuilder (ClozeTeXMath mathType latex) =
+    undefined <> renderBuilder (TeXMath mathType latex) <> undefined
+
+clozeify :: LaTeX -> ClozeLaTeX
+clozeify = undefined
 
 -- Return the text for the front and back of a card
 parseDefinition :: ([TeXArg], LaTeX) -> MathBasic
